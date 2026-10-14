@@ -3,6 +3,7 @@ import {
   IsArray,
   IsEmail,
   IsNumber,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -14,14 +15,16 @@ export class TicketDto {
   @IsString()
   session: string;
 
+  @IsOptional()
   @IsString()
-  day: string;
+  day?: string;
 
   @IsString()
   daytime: string;
 
+  @IsOptional()
   @IsString()
-  time: string;
+  time?: string;
 
   @IsNumber()
   row: number;

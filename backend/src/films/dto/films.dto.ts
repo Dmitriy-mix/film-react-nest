@@ -14,8 +14,8 @@ export class ScheduleDto {
   @IsString()
   daytime: string;
 
-  @IsString()
-  hall: string;
+  @IsNumber()
+  hall: number;
 
   @IsNumber()
   rows: number;
