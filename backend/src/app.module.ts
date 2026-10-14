@@ -25,7 +25,15 @@ import { OrderModule } from './order/order.module';
 
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'public'),
-      serveRoot: '/',
+      serveRoot: '/content',
+      serveStaticOptions: {
+        etag: false,
+        lastModified: false,
+        cacheControl: false,
+        setHeaders: (res) => {
+          res.setHeader('Cache-Control', 'no-store');
+        },
+      },
     }),
 
     RepositoryModule,
