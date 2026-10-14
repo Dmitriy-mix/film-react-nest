@@ -25,7 +25,7 @@ import { OrderModule } from './order/order.module';
 
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'public'),
-      serveRoot: '/content',
+      serveRoot: '/',
     }),
 
     RepositoryModule,
