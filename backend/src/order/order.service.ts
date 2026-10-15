@@ -9,7 +9,7 @@ import { OrderDto, OrderItemDto } from './dto/order.dto';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly repo: RepositoryService) {}
+  constructor(private readonly repo: RepositoryService) { }
 
   async create(
     dto: OrderDto,
@@ -31,7 +31,10 @@ export class OrderService {
       if (session.taken.includes(seatKey)) {
         throw new BadRequestException(`Seat ${seatKey} is already taken`);
       }
+    }
 
+    for (const ticket of dto.tickets) {
+      const seatKey = `${ticket.row}:${ticket.seat}`;
       await this.repo.addTakenSeats(ticket.film, ticket.session, seatKey);
       created.push({ ...ticket, id: randomUUID() });
     }

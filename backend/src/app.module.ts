@@ -4,7 +4,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as path from 'node:path';
 
-import { configProvider } from './app.config.provider';
 import { RepositoryModule } from './repository/repository.module';
 import { FilmsModule } from './films/films.module';
 import { OrderModule } from './order/order.module';
@@ -22,25 +21,14 @@ import { OrderModule } from './order/order.module';
         ),
       }),
     }),
-
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'public'),
       serveRoot: '/',
-      serveStaticOptions: {
-        etag: false,
-        lastModified: false,
-        cacheControl: false,
-        setHeaders: (res) => {
-          res.setHeader('Cache-Control', 'no-store');
-        },
-      },
     }),
-
     RepositoryModule,
     FilmsModule,
     OrderModule,
   ],
   controllers: [],
-  providers: [configProvider],
 })
 export class AppModule {}
