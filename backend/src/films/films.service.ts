@@ -3,7 +3,7 @@ import { RepositoryService } from '../repository/repository.service';
 
 @Injectable()
 export class FilmsService {
-  constructor(private readonly repo: RepositoryService) { }
+  constructor(private readonly repo: RepositoryService) {}
 
   async getAll() {
     const films = await this.repo.findAllFilms();

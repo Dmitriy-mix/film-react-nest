@@ -9,7 +9,7 @@ import { OrderDto, OrderItemDto } from './dto/order.dto';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly repo: RepositoryService) { }
+  constructor(private readonly repo: RepositoryService) {}
 
   async create(
     dto: OrderDto,

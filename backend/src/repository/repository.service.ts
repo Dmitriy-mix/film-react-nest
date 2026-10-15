@@ -7,7 +7,7 @@ import { FilmDto } from '../films/dto/films.dto';
 
 @Injectable()
 export class RepositoryService {
-  constructor(@InjectModel(Film.name) private filmModel: Model<FilmDocument>) { }
+  constructor(@InjectModel(Film.name) private filmModel: Model<FilmDocument>) {}
 
   async findAllFilms(): Promise<Film[]> {
     return this.filmModel.find().lean().exec();
