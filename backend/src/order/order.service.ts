@@ -1,20 +1,18 @@
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { OrderDto, TicketDto } from './dto/order.dto';
 import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
-import { RepositoryService } from '../repository/repository.service';
-import { OrderDto, OrderItemDto } from './dto/order.dto';
+  FILMS_REPOSITORY,
+  FilmsRepository,
+} from '../repository/interfaces/films.repository';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly repo: RepositoryService) {}
+  constructor(
+    @Inject(FILMS_REPOSITORY) private readonly repo: FilmsRepository,
+  ) {}
 
-  async create(
-    dto: OrderDto,
-  ): Promise<{ total: number; items: OrderItemDto[] }> {
-    const created: OrderItemDto[] = [];
+  async create(dto: OrderDto) {
+    const ticketsData: TicketDto[] = [];
 
     for (const ticket of dto.tickets) {
       const film = await this.repo.findFilmById(ticket.film);
@@ -27,17 +25,10 @@ export class OrderService {
         throw new NotFoundException(`Session ${ticket.session} not found`);
       }
 
-      const seatKey = `${ticket.row}:${ticket.seat}`;
-      if (session.taken.includes(seatKey)) {
-        throw new BadRequestException(`Seat ${seatKey} is already taken`);
-      }
+      ticketsData.push(ticket);
     }
 
-    for (const ticket of dto.tickets) {
-      const seatKey = `${ticket.row}:${ticket.seat}`;
-      await this.repo.addTakenSeats(ticket.film, ticket.session, seatKey);
-      created.push({ ...ticket, id: randomUUID() });
-    }
+    const created = await this.repo.createOrder(dto, ticketsData);
 
     return { total: created.length, items: created };
   }
