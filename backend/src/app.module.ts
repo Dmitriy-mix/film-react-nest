@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as path from 'node:path';
-
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { RepositoryModule } from './repository/repository.module';
 import { FilmsModule } from './films/films.module';
 import { OrderModule } from './order/order.module';
@@ -11,15 +10,26 @@ import { OrderModule } from './order/order.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, cache: true }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
+
+    TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        uri: config.get<string>(
-          'DATABASE_URL',
-          'mongodb://127.0.0.1:27017/practicum',
-        ),
-      }),
+      useFactory: (config: ConfigService) => {
+        const dbUrlString =
+          config.get<string>('DATABASE_URL') ||
+          'postgres://prac:1234@localhost:5432/prac';
+        const dbUrl = new URL(dbUrlString);
+
+        return {
+          type: 'postgres',
+          host: dbUrl.hostname,
+          port: parseInt(dbUrl.port || '5432'),
+          database: dbUrl.pathname.slice(1),
+          username: dbUrl.username || config.get<string>('DATABASE_USERNAME') || 'prac',
+          password: dbUrl.password || config.get<string>('DATABASE_PASSWORD') || '1234',
+          autoLoadEntities: true,
+          synchronize: false,
+        };
+      },
     }),
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', 'public'),
