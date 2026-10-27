@@ -28,10 +28,10 @@ import { Order } from './repository/entities/order.entity';
 
         return {
           type: 'postgres',
-          host: config.get<string>('DATABASE_HOST', 'localhost'),
+          host: config.get<string>('DATABASE_HOST', '127.0.0.1'),
           port: config.get<number>('DATABASE_PORT', 5432),
           username: config.get<string>('DATABASE_USERNAME', 'postgres'),
-          password: config.get<string>('DATABASE_PASSWORD', 'postgres'),
+          password: config.get<string>('DATABASE_PASSWORD'),
           database: config.get<string>('DATABASE_NAME', 'films'),
           entities: [Film, Schedule, Order],
           synchronize: true,
