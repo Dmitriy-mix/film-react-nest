@@ -33,9 +33,12 @@ export class AppRepository implements FilmsRepository {
     const filmDto = plainToInstance(FilmDto, film);
 
     if (filmDto.schedule && film.schedule) {
-      filmDto.schedule = filmDto.schedule.map((sessionDto) => {
-        const dbSchedule = film.schedule.find((s) => s.id === sessionDto.id);
+      const schedule = filmDto.schedule ?? [];
+      filmDto.schedule = schedule.map((sessionDto) => {
+        // Ищем соответствующий сеанс в оригинальной сущности из БД
+        const dbSchedule = film.schedule?.find((s) => s.id === sessionDto.id);
 
+        // Если нашли и там есть заказы — берем их, иначе пустой массив
         if (dbSchedule && dbSchedule.orders) {
           sessionDto.taken = dbSchedule.orders.map(
             (order) => `${order.row}:${order.seat}`,
