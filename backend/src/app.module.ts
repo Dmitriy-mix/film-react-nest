@@ -29,7 +29,7 @@ import { OrderModule } from './order/order.module';
           password:
             dbUrl.password || config.get<string>('DATABASE_PASSWORD') || '1234',
           autoLoadEntities: true,
-          synchronize: false,
+          synchronize: true,
         };
       },
     }),
