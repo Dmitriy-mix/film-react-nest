@@ -14,17 +14,16 @@ import { OrderModule } from './order/order.module';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const dbUrl = new URL(
-          config.get<string>('DATABASE_URL') ||
-            'postgres://localhost:5432/films',
-        );
+        const dbUrlString = config.get<string>('DATABASE_URL') || 'postgres://prac:1234@localhost:5432/prac';
+        const dbUrl = new URL(dbUrlString);
+        
         return {
           type: 'postgres',
           host: dbUrl.hostname,
           port: parseInt(dbUrl.port || '5432'),
-          database: dbUrl.pathname.slice(1),
-          username: config.get<string>('DATABASE_USERNAME') || 'prac',
-          password: config.get<string>('DATABASE_PASSWORD') || '1234',
+          database: dbUrl.pathname.slice(1), // уберет первый слэш
+          username: dbUrl.username || config.get<string>('DATABASE_USERNAME') || 'prac',
+          password: dbUrl.password || config.get<string>('DATABASE_PASSWORD') || '1234',
           autoLoadEntities: true,
           synchronize: false,
         };
