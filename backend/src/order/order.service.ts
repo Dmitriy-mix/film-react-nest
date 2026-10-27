@@ -28,18 +28,8 @@ export class OrderService {
       ticketsData.push(ticket);
     }
 
-    try {
-      const created = await this.repo.createOrder(dto, ticketsData);
-      return { total: created.length, items: created };
-    } catch (error) {
-      console.error('Ошибка БД при создании заказа (возможно, нет таблицы orders):', error);
-      return {
-        total: ticketsData.length,
-        items: ticketsData.map((ticket, index) => ({
-          ...ticket,
-          id: `fake-id-${index}`, 
-        })),
-      };
-    }
+    const created = await this.repo.createOrder(dto, ticketsData);
+
+    return { total: created.length, items: created };
   }
 }
