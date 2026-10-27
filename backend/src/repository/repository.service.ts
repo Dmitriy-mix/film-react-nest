@@ -23,7 +23,7 @@ export class AppRepository implements FilmsRepository {
   async findFilmById(id: string): Promise<FilmDto | null> {
     const film = await this.filmRepo.findOne({
       where: { id },
-      relations: ['schedule', 'schedule.orders'],
+      relations: ['schedule'],
     });
 
     if (!film) {
@@ -33,19 +33,19 @@ export class AppRepository implements FilmsRepository {
     const filmDto = plainToInstance(FilmDto, film);
 
     if (filmDto.schedule && film.schedule) {
-      const schedule = filmDto.schedule ?? [];
-      filmDto.schedule = schedule.map((sessionDto) => {
-        const dbSchedule = film.schedule?.find((s) => s.id === sessionDto.id);
+      for (const sessionDto of filmDto.schedule) {
+        try {
+          const orders = await this.dataSource.getRepository(Order).find({
+            where: { session: { id: sessionDto.id } },
+          });
 
-        if (dbSchedule && dbSchedule.orders) {
-          sessionDto.taken = dbSchedule.orders.map(
+          sessionDto.taken = orders.map(
             (order) => `${order.row}:${order.seat}`,
           );
-        } else {
+        } catch (error) {
           sessionDto.taken = [];
         }
-        return sessionDto;
-      });
+      }
     }
 
     return filmDto;
