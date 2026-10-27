@@ -26,7 +26,7 @@ import { OrderModule } from './order/order.module';
           username: config.get<string>('DATABASE_USERNAME') || 'postgres',
           password: config.get<string>('DATABASE_PASSWORD') || 'postgres',
           autoLoadEntities: true,
-          synchronize: false,
+          synchronize: true
         };
       },
     }),
