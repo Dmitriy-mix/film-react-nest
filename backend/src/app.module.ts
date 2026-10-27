@@ -6,35 +6,27 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RepositoryModule } from './repository/repository.module';
 import { FilmsModule } from './films/films.module';
 import { OrderModule } from './order/order.module';
-import { Schedule } from './repository/entities/schedule.entity';
-import { Film } from './repository/entities/film.entity';
-import { Order } from './repository/entities/order.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, cache: true }),
 
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const driver = config.get<string>('DATABASE_DRIVER', 'postgres');
-
-        if (driver !== 'postgres') {
-          console.warn(
-            `Внимание: Неподдерживаемый DATABASE_DRIVER "${driver}". Используется postgres по умолчанию.`,
-          );
-        }
-
+        const dbUrl = new URL(
+          config.get<string>('DATABASE_URL') ||
+            'postgres://localhost:5432/films',
+        );
         return {
           type: 'postgres',
-          host: config.get<string>('DATABASE_HOST', '127.0.0.1'),
-          port: config.get<number>('DATABASE_PORT', 5432),
-          username: config.get<string>('DATABASE_USERNAME', 'postgres'),
-          password: config.get<string>('DATABASE_PASSWORD'),
-          database: config.get<string>('DATABASE_NAME', 'films'),
-          entities: [Film, Schedule, Order],
-          synchronize: true,
+          host: dbUrl.hostname,
+          port: parseInt(dbUrl.port || '5432'),
+          database: dbUrl.pathname.slice(1),
+          username: config.get<string>('DATABASE_USERNAME') || 'postgres',
+          password: config.get<string>('DATABASE_PASSWORD') || 'postgres',
+          autoLoadEntities: true,
+          synchronize: false,
         };
       },
     }),
