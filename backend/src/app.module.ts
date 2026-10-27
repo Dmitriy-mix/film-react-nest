@@ -31,7 +31,7 @@ import { Order } from './repository/entities/order.entity';
           host: config.get<string>('DATABASE_HOST', 'localhost'),
           port: config.get<number>('DATABASE_PORT', 5432),
           username: config.get<string>('DATABASE_USERNAME', 'postgres'),
-          password: config.get<string>('DATABASE_PASSWORD'),
+          password: config.get<string>('DATABASE_PASSWORD', 'postgres'),
           database: config.get<string>('DATABASE_NAME', 'films'),
           entities: [Film, Schedule, Order],
           synchronize: true,
