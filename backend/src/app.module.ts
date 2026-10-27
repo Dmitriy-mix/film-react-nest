@@ -23,8 +23,8 @@ import { OrderModule } from './order/order.module';
           host: dbUrl.hostname,
           port: parseInt(dbUrl.port || '5432'),
           database: dbUrl.pathname.slice(1),
-          username: config.get<string>('DATABASE_USERNAME') || 'postgres',
-          password: config.get<string>('DATABASE_PASSWORD') || 'postgres',
+          username: config.get<string>('DATABASE_USERNAME') || 'prac',
+          password: config.get<string>('DATABASE_PASSWORD') || '1234',
           autoLoadEntities: true,
           synchronize: false,
         };
