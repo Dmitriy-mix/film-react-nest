@@ -24,12 +24,10 @@ import { OrderModule } from './order/order.module';
           host: dbUrl.hostname,
           port: parseInt(dbUrl.port || '5432'),
           database: dbUrl.pathname.slice(1),
-          username:
-            dbUrl.username || config.get<string>('DATABASE_USERNAME') || 'prac',
-          password:
-            dbUrl.password || config.get<string>('DATABASE_PASSWORD') || '1234',
+          username: dbUrl.username || config.get<string>('DATABASE_USERNAME') || 'prac',
+          password: dbUrl.password || config.get<string>('DATABASE_PASSWORD') || '1234',
           autoLoadEntities: true,
-          synchronize: true,
+          synchronize: false,
         };
       },
     }),
