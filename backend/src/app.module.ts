@@ -23,7 +23,7 @@ import { OrderModule } from './order/order.module';
           type: 'postgres',
           host: dbUrl.hostname,
           port: parseInt(dbUrl.port || '5432'),
-          database: dbUrl.pathname.slice(1), // уберет первый слэш
+          database: dbUrl.pathname.slice(1),
           username:
             dbUrl.username || config.get<string>('DATABASE_USERNAME') || 'prac',
           password:
