@@ -29,13 +29,13 @@ export class Schedule {
   @Column({ type: 'int' })
   price: number;
 
-  @Column('text', { array: true, default: [] })
+  @Column('simple-array')
   taken: string[];
 
   @OneToMany(() => Order, (order) => order.session)
   orders: Order[];
 
   @ManyToOne(() => Film, (film) => film.schedule, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'film_id' })
+  @JoinColumn({ name: 'filmId' })
   film: Film;
 }

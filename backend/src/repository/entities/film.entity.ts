@@ -12,7 +12,7 @@ export class Film {
   @Column()
   director: string;
 
-  @Column('text', { array: true, default: [] })
+  @Column('simple-array')
   tags: string[];
 
   @Column()
@@ -30,6 +30,6 @@ export class Film {
   @Column()
   cover: string;
 
-  @OneToMany(() => Schedule, (schedule) => schedule.film, {})
+  @OneToMany(() => Schedule, (schedule) => schedule.film)
   schedule: Schedule[];
 }

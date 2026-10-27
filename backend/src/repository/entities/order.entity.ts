@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Schedule } from '../../repository/entities/schedule.entity';
+import { Schedule } from './schedule.entity';
 
 @Entity('orders')
 export class Order {
@@ -28,6 +28,6 @@ export class Order {
   price: number;
 
   @ManyToOne(() => Schedule, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'session_id' })
+  @JoinColumn({ name: 'sessionId' })
   session: Schedule;
 }
