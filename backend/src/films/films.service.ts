@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { RepositoryService } from '../repository/repository.service';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  FILMS_REPOSITORY,
+  FilmsRepository,
+} from '../repository/interfaces/films.repository';
 
 @Injectable()
 export class FilmsService {
-  constructor(private readonly repo: RepositoryService) {}
+  constructor(
+    @Inject(FILMS_REPOSITORY) private readonly repo: FilmsRepository,
+  ) {}
 
   async getAll() {
     const films = await this.repo.findAllFilms();
@@ -17,6 +22,7 @@ export class FilmsService {
       description: film.description,
       image: film.image,
       cover: film.cover,
+      schedule: film.schedule,
     }));
     return { total: items.length, items };
   }
