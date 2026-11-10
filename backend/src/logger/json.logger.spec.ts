@@ -16,7 +16,11 @@ describe('JsonLogger', () => {
     logger.log('hello', 'extra');
 
     expect(spy).toHaveBeenCalledWith(
-      JSON.stringify({ level: 'log', message: 'hello', optionalParams: ['extra'] }),
+      JSON.stringify({
+        level: 'log',
+        message: 'hello',
+        optionalParams: ['extra'],
+      }),
     );
   });
 

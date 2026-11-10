@@ -14,7 +14,7 @@ export class AppRepository implements FilmsRepository {
   constructor(
     @InjectRepository(Film) private filmRepo: Repository<Film>,
     private dataSource: DataSource,
-  ) { }
+  ) {}
 
   async findAllFilms(): Promise<Film[]> {
     return this.filmRepo.find({ relations: ['schedule'] });
@@ -83,7 +83,8 @@ export class AppRepository implements FilmsRepository {
           await manager.save(newOrder);
           createdOrders.push({ ...ticket, id: newOrder.id });
         } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
+          const message =
+            error instanceof Error ? error.message : String(error);
           console.error('Ошибка при создании заказа:', message);
           createdOrders.push({ ...ticket, id: 'dummy-id-for-test' });
         }
