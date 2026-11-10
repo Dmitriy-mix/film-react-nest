@@ -1,8 +1,6 @@
 name: Build and Push Docker Images
 
 on:
-  push:
-    branches: [ main, review-2 ]
   workflow_dispatch:
 
 env:
