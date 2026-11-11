@@ -31,18 +31,3 @@ create table public.schedules
             references public.films
 );
 
-create table public.orders
-(
-    id        uuid default uuid_generate_v4() not null
-        constraint "PK_orders_id"
-            primary key,
-    email     varchar not null,
-    phone     varchar not null,
-    row       integer not null,
-    seat      integer not null,
-    price     double precision not null,
-    "sessionId" uuid
-        constraint "FK_orders_session"
-            references public.schedules
-);
-
