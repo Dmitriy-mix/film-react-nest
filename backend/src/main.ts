@@ -10,16 +10,15 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+  const config = app.get(ConfigService);
+
+  app.useLogger(createLogger(config));
   app.getHttpAdapter().getInstance().set('etag', false);
   app.setGlobalPrefix('api/afisha');
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-  app.useLogger(createLogger());
-
-  const config = app.get(ConfigService);
   const port = config.get<number>('PORT', 3000);
-
   await app.listen(port);
 }
 
