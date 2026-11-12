@@ -40,4 +40,21 @@ create table public.schedules
 alter table public.schedules
     owner to prac;
 
+create table public.orders
+(
+    id        uuid default uuid_generate_v4() not null
+        constraint "PK_orders_id"
+            primary key,
+    email     varchar not null,
+    phone     varchar not null,
+    row       integer not null,
+    seat      integer not null,
+    price     double precision not null,
+    "sessionId" uuid
+        constraint "FK_orders_session"
+            references public.schedules
+);
+
+create unique index "UQ_orders_session_seat" on public.orders ("sessionId", row, seat);
+
 
