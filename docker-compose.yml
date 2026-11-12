@@ -1,0 +1,86 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: film_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - film_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: film_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - film_network
+    depends_on:
+      - postgres
+
+  backend:
+    image: ghcr.io/dmitriy-mix/film-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: film_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_DRIVER: postgres
+      DATABASE_URL: postgres://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@postgres:5432/${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      PORT: 3000
+      LOGGER_TYPE: ${LOGGER_TYPE:-json}
+    networks:
+      - film_network
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: ghcr.io/dmitriy-mix/film-frontend:latest
+    container_name: film_frontend
+    restart: unless-stopped
+    volumes:
+      - frontend_dist:/app/dist
+    networks:
+      - film_network
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: ghcr.io/dmitriy-mix/film-nginx:latest
+    container_name: film_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - frontend_dist:/usr/share/nginx/html:ro
+    networks:
+      - film_network
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  frontend_dist:
+
+networks:
+  film_network:
+    driver: bridge
