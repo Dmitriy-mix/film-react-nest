@@ -16,20 +16,6 @@ export class AppRepository implements FilmsRepository {
     private dataSource: DataSource,
   ) {}
 
-  async onModuleInit() {
-    await this.dataSource.query(`
-      CREATE TABLE IF NOT EXISTS public.orders (
-        id uuid DEFAULT uuid_generate_v4() NOT NULL CONSTRAINT "PK_orders_id" PRIMARY KEY,
-        email varchar NOT NULL,
-        phone varchar NOT NULL,
-        row integer NOT NULL,
-        seat integer NOT NULL,
-        price double precision NOT NULL,
-        "sessionId" uuid CONSTRAINT "FK_orders_session" REFERENCES public.schedules
-      );
-    `);
-  }
-
   async findAllFilms(): Promise<Film[]> {
     return this.filmRepo.find({ relations: ['schedule'] });
   }

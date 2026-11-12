@@ -29,10 +29,10 @@ services:
       - postgres
 
   backend:
+    image: ghcr.io/dmitriy-mix/film-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
-      image: ghcr.io/dmitriy-mix/film-backend:latest
     container_name: film_backend
     restart: unless-stopped
     environment:
