@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { OrderDto, TicketDto } from './dto/order.dto';
 import {
   FILMS_REPOSITORY,
@@ -25,21 +30,15 @@ export class OrderService {
         throw new NotFoundException(`Session ${ticket.session} not found`);
       }
 
+      const seatKey = `${ticket.row}:${ticket.seat}`;
+      if (session.taken.includes(seatKey)) {
+        throw new BadRequestException(`Seat ${seatKey} is already taken`);
+      }
+
       ticketsData.push(ticket);
     }
 
-    try {
-      const created = await this.repo.createOrder(dto, ticketsData);
-      return { total: created.length, items: created };
-    } catch (error) {
-      console.error('Ошибка БД при создании заказа (возможно, нет таблицы orders):', error);
-      return {
-        total: ticketsData.length,
-        items: ticketsData.map((ticket, index) => ({
-          ...ticket,
-          id: `${index}`, 
-        })),
-      };
-    }
+    const created = await this.repo.createOrder(dto, ticketsData);
+    return { total: created.length, items: created };
   }
 }
