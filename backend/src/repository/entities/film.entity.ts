@@ -12,7 +12,7 @@ export class Film {
   @Column()
   director: string;
 
-  @Column('simple-array')
+  @Column('text', { array: true, default: [] })
   tags: string[];
 
   @Column()

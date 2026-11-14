@@ -1,13 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
+import { randomUUID } from 'node:crypto';
 
 import { FilmsRepository } from './interfaces/films.repository';
-import { OrderDto } from '../order/dto/order.dto';
+import { OrderDto, TicketDto } from '../order/dto/order.dto';
 import { FilmDto } from '../films/dto/films.dto';
 import { Film } from './entities/film.entity';
-import { Order } from './entities/order.entity';
+import { Schedule } from './entities/schedule.entity';
 
 @Injectable()
 export class AppRepository implements FilmsRepository {
@@ -26,64 +27,36 @@ export class AppRepository implements FilmsRepository {
       relations: ['schedule'],
     });
 
-    if (!film) {
-      return null;
-    }
-
-    const filmDto = plainToInstance(FilmDto, film);
-
-    if (filmDto.schedule && film.schedule) {
-      for (const sessionDto of filmDto.schedule) {
-        try {
-          const orders = await this.dataSource.getRepository(Order).find({
-            where: { session: { id: sessionDto.id } },
-          });
-
-          sessionDto.taken = orders.map(
-            (order) => `${order.row}:${order.seat}`,
-          );
-        } catch (error) {
-          sessionDto.taken = [];
-        }
-      }
-    }
-
-    return filmDto;
+    return film ? plainToInstance(FilmDto, film) : null;
   }
 
-  async createOrder(dto: OrderDto, ticketsData: any[]): Promise<any[]> {
-    return await this.dataSource.transaction(async (manager) => {
-      const createdOrders = [];
+  async createOrder(dto: OrderDto, ticketsData: TicketDto[]): Promise<any[]> {
+    return this.dataSource.transaction(async (manager) => {
+      const items: Array<TicketDto & { id: string }> = [];
 
       for (const ticket of ticketsData) {
-        const isTaken = await manager.findOne(Order, {
-          where: {
-            session: { id: ticket.session },
-            row: ticket.row,
-            seat: ticket.seat,
-          },
+        const session = await manager.findOne(Schedule, {
+          where: { id: ticket.session },
+          lock: { mode: 'pessimistic_write' },
         });
 
-        if (isTaken) {
-          throw new BadRequestException(
-            `Seat ${ticket.row}:${ticket.seat} is already taken`,
-          );
+        if (!session) {
+          throw new NotFoundException('Сеанс не найден');
         }
 
-        const newOrder = manager.create(Order, {
-          email: dto.email,
-          phone: dto.phone,
-          row: ticket.row,
-          seat: ticket.seat,
-          price: ticket.price,
-          session: { id: ticket.session },
-        });
+        const seatKey = `${ticket.row}:${ticket.seat}`;
 
-        await manager.save(newOrder);
-        createdOrders.push({ ...ticket, id: newOrder.id });
+        if (session.taken.includes(seatKey)) {
+          throw new BadRequestException('Место уже занято');
+        }
+
+        session.taken.push(seatKey);
+        await manager.save(Schedule, session);
+
+        items.push({ ...ticket, id: randomUUID() });
       }
 
-      return createdOrders;
+      return items;
     });
   }
 }

@@ -4,9 +4,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
-import { Order } from './order.entity';
 import { Film } from './film.entity';
 
 @Entity('schedules')
@@ -29,11 +27,8 @@ export class Schedule {
   @Column({ type: 'int' })
   price: number;
 
-  @Column('simple-array')
+  @Column('text', { array: true, default: [] })
   taken: string[];
-
-  @OneToMany(() => Order, (order) => order.session)
-  orders: Order[];
 
   @ManyToOne(() => Film, (film) => film.schedule, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'filmId' })
