@@ -29,10 +29,10 @@ services:
       - postgres
 
   backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     image: ghcr.io/dmitriy-mix/film-backend:latest
-    # build:
-    #   context: ./backend
-    #   dockerfile: Dockerfile
     container_name: film_backend
     restart: unless-stopped
     environment:
@@ -48,9 +48,9 @@ services:
       - postgres
 
   frontend:
-    # build:
-    #   context: ./frontend
-    #   dockerfile: Dockerfile
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     image: ghcr.io/dmitriy-mix/film-frontend:latest
     container_name: film_frontend
     restart: unless-stopped
@@ -60,9 +60,9 @@ services:
       - film_network
 
   nginx:
-    # build:
-    #   context: ./nginx
-    #   dockerfile: Dockerfile
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
     image: ghcr.io/dmitriy-mix/film-nginx:latest
     container_name: film_nginx
     restart: unless-stopped
